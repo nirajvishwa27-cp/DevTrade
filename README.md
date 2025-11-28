@@ -24,10 +24,3 @@ Node.js + Express (Backend)
 MongoDB (Database)
 
 Supabase for secure file storage
-
-If you want, I can also create:
-✔ A full README.md
-✔ Logo + tagline ideas
-✔ Feature badges
-✔ Installation guide and folder structure
-✔ API documentation section
