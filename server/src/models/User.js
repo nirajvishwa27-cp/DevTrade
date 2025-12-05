@@ -29,10 +29,10 @@ const userSchema = new mongoose.Schema(
     avatar: {
       type: String,
     },
-    
+
     role: {
       type: String,
-      default: "user", 
+      default: "user",
     },
 
     bio: {
@@ -76,14 +76,16 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    lastLogin: {
+      type: Date,
+    },
     resetpasswordToken: String,
     resetpasswordExpires: Date,
     verificationToken: String,
     verificationExpiresAt: Date,
-  }
-  ,
+  },
+
   { timestamps: true }
 );
-
 
 export default mongoose.model("User", userSchema);
