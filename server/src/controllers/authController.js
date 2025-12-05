@@ -20,29 +20,35 @@ export const signup = async (req, res) => {
     }
 
     const hashPassword = await bcryptjs.hash(password, 10);
-    const verificationToken = Math.floor(
-      100000 + Math.random() * 900000
-    ).toString();
+    const verificationToken = Math.floor(100000 + Math.random() * 900000).toString();
 
     const user = new User({
       email,
       password: hashPassword,
       name,
       verificationToken,
-      verificationExpiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
+      verificationExpiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
     });
 
     await user.save();
-    // Here you would typically send the verification email with the token
     generateTokenAndCookie(res, user._id);
 
-    await sendVerificationEmail(user.email, verificationToken);
+    try {
+        await sendVerificationEmail(user.email, verificationToken);
+    } catch (emailError) {
+        // Log the specific Resend error so you can see it in the terminal
+        console.error("Resend Failed:", emailError);
+        
+        // OPTIONAL: Delete the user if email fails, so they can try again
+        // await User.findByIdAndDelete(user._id);
+        // return res.status(500).json({ message: "Error sending email, please try again" });
+    }
 
     return res.status(201).json({
       message: "User created successfully",
       user: {
         ...user._doc,
-        password: undefined, // Exclude password from the response
+        password: undefined,
       },
     });
   } catch (error) {
@@ -80,8 +86,9 @@ export const verifyEmail = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error during email verification:", error);
-  }
+  console.error("Error during email verification:", error);
+  return res.status(500).json({ message: "Internal server error" });
+}
 };
 
 export const login = async (req, res) => {
@@ -107,7 +114,7 @@ export const login = async (req, res) => {
     if (!user.isVerified) {
       return res.status(403).json({ message: "Email not verified" });
     }
-//npm install bcryptjs cookie-parser cors crypto dotenv express jsonwebtoken mailtrap mongoose
+    //npm install bcryptjs cookie-parser cors crypto dotenv express jsonwebtoken mailtrap mongoose
 
     generateTokenAndCookie(res, user._id);
     user.lastLogin = new Date();
@@ -150,7 +157,7 @@ export const forgotPassword = async (req, res) => {
     await user.save();
     await sendPasswordResetEmail(
       user.email,
-      `${process.env.Client_URL}/reset-password/${resetToken}`
+      `${process.env.CLIENT_URL}/reset-password/${resetToken}` // Changed from Client_URL
     );
     res.status(200).json({
       message: "Password reset token generated",
