@@ -61,6 +61,7 @@ export const getProjectById = async (req, res) => {
       });
     }
     return res.status(200).json({
+      success: true,
       message:"Project fetched successfully by id",
       project
     })
@@ -74,7 +75,6 @@ export const uploadProject = async (req, res) => {
   const {
     title,
     description,
-    seller,
     price,
     techStack,
     category,
@@ -93,7 +93,7 @@ export const uploadProject = async (req, res) => {
     const project = new Project({
       title,
       description,
-      seller,
+      seller: req.user.id,
       price,
       techStack,
       category,
@@ -123,7 +123,12 @@ export const updateProject = async (req, res) => {
   try {
     const project = await Project.findOne({ _id: id });
     if (!project) {
-      return res.status(400).json({ message: "Project does not exist" });
+      return res.status(404).json({ message: "Project does not exist" });
+    }
+
+    // Verify ownership
+    if (project.seller.toString() !== req.user.id) {
+      return res.status(403).json({ message: "Unauthorized: You don't own this project" });
     }
 
     Object.keys(updates).forEach((key) => {

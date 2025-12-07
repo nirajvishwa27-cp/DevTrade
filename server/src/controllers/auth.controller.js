@@ -107,10 +107,6 @@ export const login = async (req, res) => {
     if (!isPasswordValid) {
       return res.status(400).json({ message: "Invalid email or password" });
     }
-
-    if (!user.isVerified) {
-      return res.status(403).json({ message: "Email not verified" });
-    }
     //npm install bcryptjs cookie-parser cors crypto dotenv express jsonwebtoken mailtrap mongoose
 
     generateTokenAndCookie(res, user._id);
@@ -201,18 +197,3 @@ export const resetPassword = async (req, res) => {
   }
 };
 
-export const checkAuth = async (req, res) => {
-  try {
-    const user = await User.findById(req.userId).select("-password");
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-    return res.status(200).json({
-      message: "User authenticated successfully",
-      user,
-    });
-  } catch (error) {
-    console.error("Error during authentication check:", error);
-    return res.status(500).json({ message: "Internal server error" });
-  }
-};
