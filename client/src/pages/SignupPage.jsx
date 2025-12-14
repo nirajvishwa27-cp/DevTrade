@@ -13,19 +13,6 @@ function Signup() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // EMAIL + TEMP TOKEN coming from VerificationPage
-  const verifiedEmail = location.state?.email;
-  const tempToken = location.state?.tempToken;
-
-  // If user visits signup without verification → redirect
-  if (!verifiedEmail || !tempToken) {
-    return (
-      <div className="flex min-h-screen items-center justify-center text-white">
-        Invalid Session. Please verify your email again.
-      </div>
-    );
-  }
-
   const [formData, setFormData] = useState({
     name: "",
     password: "",
@@ -41,6 +28,19 @@ function Signup() {
       toast.error(error.response?.data?.message || "Signup failed");
     },
   });
+
+  // EMAIL + TEMP TOKEN coming from VerificationPage
+  const verifiedEmail = location.state?.email;
+  const tempToken = location.state?.tempToken;
+
+  // If user visits signup without verification → redirect
+  if (!verifiedEmail || !tempToken) {
+    return (
+      <div className="flex min-h-screen items-center justify-center text-white">
+        Invalid Session. Please verify your email again.
+      </div>
+    );
+  }
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
