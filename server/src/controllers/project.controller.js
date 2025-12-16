@@ -42,11 +42,11 @@ export const getMyProject = async (req, res) => {
 };
 
 export const downloadProjectById = async (req, res) => {
-  
+
   try {
-    
+
   } catch (error) {
-    
+
   }
 };
 
@@ -62,7 +62,7 @@ export const getProjectById = async (req, res) => {
     }
     return res.status(200).json({
       success: true,
-      message:"Project fetched successfully by id",
+      message: "Project fetched successfully by id",
       project
     })
   } catch (error) {
@@ -72,16 +72,16 @@ export const getProjectById = async (req, res) => {
 };
 
 export const uploadProject = async (req, res) => {
-    const { 
-      title, 
-      description, 
-      price, 
-      techStack, 
-      category, 
-      thumbnail, // Frontend sent this as a URL string
-      images,    // Frontend sent this as an array of URL strings
-      fileUrl    // Frontend sent this as a URL string
-    } = req.body;
+  const {
+    title,
+    description,
+    price,
+    techStack,
+    category,
+    thumbnail, // Frontend sent this as a URL string
+    images,    // Frontend sent this as an array of URL strings
+    fileUrl    // Frontend sent this as a URL string
+  } = req.body;
 
 
   try {
@@ -154,27 +154,33 @@ export const updateProject = async (req, res) => {
 };
 
 export const deleteProject = async (req, res) => {
-  const { id } = req.params;
+  const { id } = req.params; // ONLY id exists
 
   try {
-    const project = await Project.findOne({ _id: id });
+    const project = await Project.findById(id);
+
     if (!project) {
       return res.status(404).json({
         message: "Project does not exist",
       });
     }
-    await Project.deleteOne({ _id: id });
+
+    // Check if logged‑in user is owner
+    if (project.seller.toString() !== req.user.id) {
+      return res.status(403).json({ message: "Unauthorized" });
+    }
+
+    await Project.findByIdAndDelete(id);
+
     return res.status(200).json({
       success: true,
       message: "Project deleted successfully",
     });
   } catch (error) {
     console.error("Error during project deletion:", error);
-    return res
-      .status(500)
-      .json({
-        message: "Internal server error,(error in deleteProject controller)",
-        error,
-      });
+    return res.status(500).json({
+      message: "Internal server error (error in deleteProject controller)",
+      error,
+    });
   }
 };

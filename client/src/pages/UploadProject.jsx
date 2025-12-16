@@ -11,7 +11,10 @@ import { Label } from "@/components/ui/label";
 import toast from "react-hot-toast";
 
 import { uploadProject } from "@/api/project.api";
-import { uploadToCloudinary, uploadZipToCloudinary } from "@/utils/uploadToCloudinary";
+import {
+  uploadToCloudinary,
+  uploadZipToCloudinary,
+} from "@/utils/uploadToCloudinary";
 
 export default function UploadProject() {
   const navigate = useNavigate();
@@ -81,14 +84,13 @@ export default function UploadProject() {
     <div className="flex min-h-screen items-center justify-center bg-black text-white p-4">
       <Card className="w-full max-w-2xl bg-gray-950 border-gray-800 shadow-xl">
         <CardHeader>
-          <CardTitle className="text-2xl text-center font-semibold">
+          <CardTitle className="text-2xl text-center font-semibold text-blue-400">
             Upload New Project
           </CardTitle>
         </CardHeader>
 
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-
             {/* Title */}
             <div>
               <Label>Project Title</Label>
@@ -182,7 +184,6 @@ export default function UploadProject() {
             <Button className="w-full" disabled={isPending}>
               {isPending ? "Uploading..." : "Upload Project"}
             </Button>
-
           </form>
         </CardContent>
       </Card>
