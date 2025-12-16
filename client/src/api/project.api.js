@@ -11,6 +11,8 @@ export async function uploadProject(data) {
 }
 
 export async function updateProject(id, data) {
+  console.log(data);
+  
   const res = await api.patch(`/project/update/${id}`, data);
   return res;
 }

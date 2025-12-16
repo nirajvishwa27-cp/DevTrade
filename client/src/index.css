@@ -113,6 +113,18 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+  background-color: #000;
+  margin: 0;
+  padding: 0;
+  overscroll-behavior: none;
+}
+
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

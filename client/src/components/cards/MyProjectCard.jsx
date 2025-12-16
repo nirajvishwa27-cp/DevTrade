@@ -20,14 +20,14 @@ export default function MyProjectCard({ project, refetch }) {
   });
 
   return (
-    <div className="relative group bg-gray-900 border border-gray-800 p-4 rounded-xl shadow-lg hover:shadow-xl transition">
-      {/* MAIN CARD */}
+    <div className="bg-[#0d121a] border border-gray-800 rounded-xl shadow-lg p-4 space-y-4">
+      {/* FIX: Removed border + outline wrapper */}
       <ProjectCard project={project} />
 
-      {/* ACTION BUTTONS (inside card box now) */}
-      <div className="mt-4 grid grid-cols-2 gap-3">
-        <Link to={`/edit/${project._id}`}>
-          <Button className="bg-blue-600 hover:bg-blue-700 w-full shadow-md">
+      {/* BUTTONS */}
+      <div className="flex items-center justify-between gap-2 mt-3">
+        <Link to={`/update/${project._id}`} className="w-full">
+          <Button className="h-8 text-xs bg-blue-600 hover:bg-blue-700">
             Edit
           </Button>
         </Link>
@@ -35,7 +35,7 @@ export default function MyProjectCard({ project, refetch }) {
         <Button
           onClick={() => setConfirmOpen(true)}
           disabled={isPending}
-          className="bg-red-600 hover:bg-red-700 w-full shadow-md"
+          className=" h-8 text-xs bg-red-600 hover:bg-red-700"
         >
           Delete
         </Button>
@@ -44,7 +44,7 @@ export default function MyProjectCard({ project, refetch }) {
       {/* CONFIRMATION MODAL */}
       {confirmOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-gray-900 border border-gray-700 rounded-xl p-6 w-full max-w-md shadow-2xl animate-scaleIn">
+          <div className="bg-gray-900 border border-gray-700 rounded-xl p-6 w-full max-w-md shadow-2xl">
             <h2 className="text-2xl font-semibold text-white mb-2">
               Delete Project?
             </h2>
@@ -55,17 +55,16 @@ export default function MyProjectCard({ project, refetch }) {
               This action cannot be undone.
             </p>
 
-            {/* FIXED BUTTON CONTAINER */}
-            <div className="flex gap-3 w-full">
+            <div className="flex gap-3">
               <Button
-                className="bg-gray-700 hover:bg-gray-600 flex-1"
+                className="bg-gray-700 hover:bg-gray-600 w-full"
                 onClick={() => setConfirmOpen(false)}
               >
                 Cancel
               </Button>
 
               <Button
-                className="bg-red-600 hover:bg-red-700 flex-1"
+                className="bg-red-600 hover:bg-red-700 w-full"
                 disabled={isPending}
                 onClick={() => mutate()}
               >

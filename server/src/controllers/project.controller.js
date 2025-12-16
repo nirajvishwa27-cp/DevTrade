@@ -121,6 +121,7 @@ export const uploadProject = async (req, res) => {
 export const updateProject = async (req, res) => {
   const { id } = req.params;
   const updates = req.body; //title = ai maker, price = 45
+  
   try {
     const project = await Project.findOne({ _id: id });
     if (!project) {
