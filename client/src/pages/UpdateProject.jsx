@@ -24,9 +24,7 @@ export default function UpdateProject() {
     queryFn: () => getProjectById(id),
   });
 
-  //    console.log(data)
-
-  const [form, setForm] = useState(data?.data?.project || null);
+  const [form, setForm] = useState(null);
 
   useEffect(() => {
     if (data?.data?.project) {
@@ -37,6 +35,7 @@ export default function UpdateProject() {
         price: p.price,
         techStack: p.techStack.join(", "),
         category: p.category || "",
+        subcategory: p.subcategory || "",
         thumbnail: p.thumbnail,
         images: p.images || [],
         fileUrl: p.fileUrl || "",
@@ -81,11 +80,19 @@ export default function UpdateProject() {
       navigate("/my-projects");
     },
 
-    onError: () => toast.error("Failed to update project."),
+    onError: (err) => {
+      toast.error(err.response?.data?.message || "Failed to update project.");
+    },
   });
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    if (!form.subcategory.trim()) {
+      toast.error("Subcategory is required");
+      return;
+    }
+
     mutate();
   };
 
@@ -99,7 +106,7 @@ export default function UpdateProject() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-black text-white p-6">
-      <Card className="w-full max-w-2xl bg-gray-950 border border-gray-800 shadow-2xl animate-in fade-in duration-300 rounded-xl">
+      <Card className="w-full max-w-2xl bg-gray-950 border border-gray-800 shadow-2xl rounded-xl">
         <CardHeader>
           <CardTitle className="text-3xl font-semibold text-center text-blue-400">
             Update Project
@@ -109,7 +116,7 @@ export default function UpdateProject() {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Title */}
-            <div className="space-y-1">
+            <div>
               <Label>Project Title</Label>
               <Input
                 name="title"
@@ -121,7 +128,7 @@ export default function UpdateProject() {
             </div>
 
             {/* Description */}
-            <div className="space-y-1">
+            <div>
               <Label>Description</Label>
               <Textarea
                 name="description"
@@ -133,7 +140,7 @@ export default function UpdateProject() {
             </div>
 
             {/* Price */}
-            <div className="space-y-1">
+            <div>
               <Label>Price (₹)</Label>
               <Input
                 type="number"
@@ -146,8 +153,8 @@ export default function UpdateProject() {
             </div>
 
             {/* Tech Stack */}
-            <div className="space-y-1">
-              <Label>Tech Stack</Label>
+            <div>
+              <Label>Tech Stack (comma separated)</Label>
               <Input
                 name="techStack"
                 value={form.techStack}
@@ -157,18 +164,31 @@ export default function UpdateProject() {
             </div>
 
             {/* Category */}
-            <div className="space-y-1">
+            <div>
               <Label>Category</Label>
               <Input
                 name="category"
                 value={form.category}
                 onChange={handleChange}
                 className="bg-gray-900 border-gray-700 text-white"
+                required
+              />
+            </div>
+
+            {/* Subcategory */}
+            <div>
+              <Label>Subcategory</Label>
+              <Input
+                name="subcategory"
+                value={form.subcategory}
+                onChange={handleChange}
+                className="bg-gray-900 border-gray-700 text-white"
+                required
               />
             </div>
 
             {/* Thumbnail */}
-            <div className="space-y-1">
+            <div>
               <Label>Thumbnail</Label>
               <Input
                 type="file"
@@ -185,7 +205,7 @@ export default function UpdateProject() {
             </div>
 
             {/* Additional Images */}
-            <div className="space-y-1">
+            <div>
               <Label>Additional Images</Label>
               <Input
                 type="file"
@@ -205,8 +225,8 @@ export default function UpdateProject() {
             </div>
 
             {/* File URL */}
-            <div className="space-y-1">
-              <Label>Project ZIP / File</Label>
+            <div>
+              <Label>Project File ZIP</Label>
               <Input
                 type="file"
                 onChange={handleFileUpload}
