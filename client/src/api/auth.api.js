@@ -25,3 +25,10 @@ export const logoutUser = async(data) => {
     return res.data
 }
 
+
+export const getMyProfile = async () => {
+  const res = await api.get("/auth/getMyProfile");
+  return res.data.user;
+};
+
+

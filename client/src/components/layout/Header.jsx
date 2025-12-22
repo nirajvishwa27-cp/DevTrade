@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 import { cn } from "@/lib/utils";
 import { useEffect, useRef, useState } from "react";
-import axios from "axios";
+import api from "@/utils/axios";
 
 import {
   DropdownMenu,
@@ -12,8 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { Search, User } from "lucide-react";
-import api from "@/utils/axios";
+import { Search } from "lucide-react";
 
 export default function Header() {
   const { auth, logout } = useAuth();
@@ -23,13 +22,12 @@ export default function Header() {
 
   const isActive = (path) => location.pathname === path;
 
-  // 🔍 Search state
+  // SEARCH STATE
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [open, setOpen] = useState(false);
-  const containerRef = useRef(null);
 
-  // 🔹 Debounced search
+  // Fetch search results
   useEffect(() => {
     if (!query.trim()) {
       setResults([]);
@@ -39,14 +37,10 @@ export default function Header() {
 
     const timer = setTimeout(async () => {
       try {
-        const res = await api.get(
-        `project/search?query=${query}`
-      );
-
+        const res = await api.get(`/project/search?query=${query}`);
         setResults(Array.isArray(res.data) ? res.data : []);
         setOpen(true);
       } catch (err) {
-        console.error("Header search failed", err);
         setResults([]);
         setOpen(false);
       }
@@ -65,7 +59,8 @@ export default function Header() {
       "
     >
       <div className="mx-auto flex h-12 md:h-16 max-w-7xl items-center gap-6 px-4 md:px-6">
-        {/* Logo */}
+
+        {/* LOGO */}
         <Link
           to="/"
           className="text-lg md:text-xl font-semibold tracking-tight text-white"
@@ -73,11 +68,8 @@ export default function Header() {
           DevTrade
         </Link>
 
-        {/* 🔍 SEARCH */}
-        <div
-          ref={containerRef}
-          className="relative hidden md:flex flex-1 max-w-md"
-        >
+        {/* 🔍 SEARCH BAR */}
+        <div className="relative hidden md:flex flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
 
           <input
@@ -95,7 +87,6 @@ export default function Header() {
             "
           />
 
-          {/* 🔽 SEARCH RESULTS DROPDOWN */}
           {open && results.length > 0 && (
             <div
               className="
@@ -124,7 +115,6 @@ export default function Header() {
                     text-left
                   "
                 >
-                  {/* Thumbnail */}
                   <img
                     src={project.thumbnail || "/placeholder.png"}
                     alt={project.title}
@@ -133,16 +123,12 @@ export default function Header() {
                       rounded-md
                       object-cover
                       border border-gray-700
-                      shrink-0
                     "
                   />
-
-                  {/* Info */}
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-white truncate">
                       {project.title}
                     </p>
-
                     <div className="mt-0.5 flex gap-1 flex-wrap">
                       {project.techStack?.slice(0, 3).map((tech) => (
                         <span
@@ -166,7 +152,7 @@ export default function Header() {
           )}
         </div>
 
-        {/* Navigation */}
+        {/* NAV LINKS */}
         <nav className="flex items-center gap-6 text-sm font-medium text-gray-300">
           {[
             { name: "Explore", path: "/projects" },
@@ -196,33 +182,53 @@ export default function Header() {
           })}
         </nav>
 
-        {/* Right Section */}
+        {/* PROFILE + AUTH */}
         <div className="ml-auto flex items-center gap-4">
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button
                   className="
-                    flex h-9 w-9 items-center justify-center
+                    flex h-9 w-9 overflow-hidden
+                    items-center justify-center
                     rounded-full
                     bg-gray-800 text-gray-200
-                    hover:bg-gray-700 transition
+                    hover:ring-2 hover:ring-blue-500
+                    transition
                   "
                 >
-                  <User className="h-4 w-4" />
+                  {user.profileImage ? (
+                    <img
+                      src={user.profileImage}
+                      alt={user.name}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <span className="font-medium text-white">
+                      {user.name?.[0]?.toUpperCase() || "U"}
+                    </span>
+                  )}
                 </button>
               </DropdownMenuTrigger>
 
               <DropdownMenuContent
                 align="end"
-                className="w-48 border border-gray-800 bg-gray-900/95 backdrop-blur shadow-xl"
+                className="
+                  w-48
+                  border border-gray-800
+                  bg-gray-900/95
+                  backdrop-blur
+                  shadow-xl
+                "
               >
                 <div className="px-3 py-2 text-sm text-gray-300 border-b border-gray-800">
-                  Hi,{" "}
-                  <span className="font-medium text-white">{user.name}</span>
+                  Hi, <span className="font-medium text-white">{user.name}</span>
                 </div>
 
-                <DropdownMenuItem className="cursor-pointer text-gray-200 focus:bg-gray-800 focus:text-white">
+                <DropdownMenuItem
+                  onClick={() => navigate("/profile")}
+                  className="cursor-pointer text-gray-200 focus:bg-gray-800 focus:text-white"
+                >
                   Profile
                 </DropdownMenuItem>
 

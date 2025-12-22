@@ -12,6 +12,7 @@ import GetMyProjects from "./pages/GetMyProjects";
 import ProjectDetails from "./pages/ProjectDetails";
 import UpdateProject from "./pages/UpdateProject";
 import { SidebarProvider } from "./context/SidebarContext";
+import ProfilePage from "./pages/ProfilePage";
 
 function App() {
   return (
@@ -39,6 +40,14 @@ function App() {
             <PublicRoute>
               <LoginPage />
             </PublicRoute>
+          }
+        />
+         <Route
+          path="/profile"
+          element={
+               <AppLayout>
+              <ProfilePage />
+            </AppLayout>
           }
         />
         {/* PROTECTED PAGE → Only when logged in */}

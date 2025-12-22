@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
-import { useAuth } from "../context/AuthContext";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,6 +15,17 @@ import {
   uploadZipToCloudinary,
 } from "@/utils/uploadToCloudinary";
 
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
+
+import { CATEGORIES } from "@/config/categories";
+import { TECH_STACK } from "@/config/techstack";
+
 export default function UploadProject() {
   const navigate = useNavigate();
 
@@ -23,47 +33,72 @@ export default function UploadProject() {
     title: "",
     description: "",
     price: "",
-    techStack: "",
+    techStack: [],
+    techSearch: "",
     category: "",
+    subcategory: "",
     thumbnail: "",
     images: [],
     fileUrl: "",
   });
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  // ⬆️ FIX 1 — Separate file upload handlers:
-
+  // ⭐ Prevent race condition by using prev state
   const handleThumbnailUpload = async (e) => {
     const file = e.target.files[0];
     const url = await uploadToCloudinary(file);
-    setForm({ ...form, thumbnail: url });
+
+    if (!url) {
+      toast.error("Thumbnail upload failed");
+      return;
+    }
+
+    setForm((prev) => ({ ...prev, thumbnail: url }));
     toast.success("Thumbnail uploaded!");
   };
 
   const handleImagesUpload = async (e) => {
     const file = e.target.files[0];
     const url = await uploadToCloudinary(file);
-    setForm({ ...form, images: [...form.images, url] });
+
+    if (!url) {
+      toast.error("Image upload failed");
+      return;
+    }
+
+    setForm((prev) => ({
+      ...prev,
+      images: [...prev.images, url],
+    }));
+
     toast.success("Image added!");
   };
 
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
     const url = await uploadZipToCloudinary(file);
-    setForm({ ...form, fileUrl: url });
+
+    if (!url) {
+      toast.error("Project file upload failed");
+      return;
+    }
+
+    setForm((prev) => ({ ...prev, fileUrl: url }));
     toast.success("Project file uploaded!");
   };
 
-  // BACKEND CALL
+  const handleChange = (e) => {
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
   const { mutate, isPending } = useMutation({
     mutationFn: async () => {
       const payload = {
         ...form,
-        techStack: form.techStack.split(",").map((t) => t.trim()),
+        techStack: form.techStack,
+        category: form.category,
+        subcategory: form.subcategory,
       };
+
       return await uploadProject(payload);
     },
     onSuccess: () => {
@@ -77,6 +112,42 @@ export default function UploadProject() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    if (!form.title.trim()) {
+      toast.error("Please enter project title");
+      return;
+    }
+
+    if (!form.description.trim()) {
+      toast.error("Please enter project description");
+      return;
+    }
+
+    if (!form.price) {
+      toast.error("Please enter price");
+      return;
+    }
+
+    if (!form.techStack.length) {
+      toast.error("Please select at least one tech stack");
+      return;
+    }
+
+    if (!form.category) {
+      toast.error("Please select a category");
+      return;
+    }
+
+    if (!form.subcategory) {
+      toast.error("Please select a subcategory");
+      return;
+    }
+
+    if (!form.fileUrl) {
+      toast.error("Please upload project file");
+      return;
+    }
+
     mutate();
   };
 
@@ -91,7 +162,8 @@ export default function UploadProject() {
 
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Title */}
+
+            {/* TITLE */}
             <div>
               <Label>Project Title</Label>
               <Input
@@ -103,7 +175,7 @@ export default function UploadProject() {
               />
             </div>
 
-            {/* Description */}
+            {/* DESCRIPTION */}
             <div>
               <Label>Description</Label>
               <Textarea
@@ -115,42 +187,150 @@ export default function UploadProject() {
               />
             </div>
 
-            {/* Price */}
+            {/* PRICE */}
             <div>
               <Label>Price (₹)</Label>
               <Input
                 type="number"
                 name="price"
-                placeholder="$100"
+                placeholder="₹100"
                 className="bg-gray-900 border-gray-700 text-white"
                 onChange={handleChange}
                 required
               />
             </div>
 
-            {/* TechStack */}
+            {/* TECH STACK MULTI SELECT */}
             <div>
               <Label>Tech Stack</Label>
+
+              {/* SELECTED TAGS */}
+              <div className="flex flex-wrap gap-2 mb-2 mt-2">
+                {form.techStack.map((item, index) => (
+                  <span
+                    key={index}
+                    onClick={() =>
+                      setForm((prev) => ({
+                        ...prev,
+                        techStack: prev.techStack.filter((t) => t !== item),
+                      }))
+                    }
+                    className="
+                      px-2 py-1 rounded bg-gray-800 border border-gray-700 
+                      text-xs cursor-pointer hover:bg-red-600 hover:border-red-500 
+                      transition
+                    "
+                  >
+                    {item} ✕
+                  </span>
+                ))}
+              </div>
+
+              {/* SEARCH INPUT */}
               <Input
-                name="techStack"
-                placeholder="React, Node, MongoDB"
+                placeholder="Search Tech (React, Node, ML...)"
                 className="bg-gray-900 border-gray-700 text-white"
-                onChange={handleChange}
+                value={form.techSearch}
+                onChange={(e) =>
+                  setForm((prev) => ({ ...prev, techSearch: e.target.value }))
+                }
               />
+
+              {/* DROPDOWN */}
+              {form.techSearch && (
+                <div className="mt-2 bg-gray-900 border border-gray-800 rounded-lg max-h-36 overflow-y-auto">
+                  {TECH_STACK.filter((item) =>
+                    item.toLowerCase().includes(form.techSearch.toLowerCase())
+                  )
+                    .slice(0, 8)
+                    .map((item) => (
+                      <div
+                        key={item}
+                        onClick={() => {
+                          setForm((prev) => ({
+                            ...prev,
+                            techStack: prev.techStack.includes(item)
+                              ? prev.techStack
+                              : [...prev.techStack, item],
+                            techSearch: "",
+                          }));
+                        }}
+                        className="
+                          px-3 py-2 cursor-pointer text-sm text-gray-300 
+                          hover:bg-gray-800 transition
+                        "
+                      >
+                        {item}
+                      </div>
+                    ))}
+
+                  {!TECH_STACK.some((item) =>
+                    item.toLowerCase().includes(form.techSearch.toLowerCase())
+                  ) && (
+                    <div className="px-3 py-2 text-gray-500 text-sm">
+                      No match found
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
-            {/* Category */}
+            {/* CATEGORY */}
             <div>
               <Label>Category</Label>
-              <Input
-                name="category"
-                placeholder="Web, ML, Android..."
-                className="bg-gray-900 border-gray-700 text-white"
-                onChange={handleChange}
-              />
+              <Select
+                onValueChange={(value) =>
+                  setForm((prev) => ({
+                    ...prev,
+                    category: value,
+                    subcategory: "",
+                  }))
+                }
+              >
+                <SelectTrigger className="bg-gray-900 border-gray-700 text-white">
+                  <SelectValue placeholder="Select Category" />
+                </SelectTrigger>
+
+                <SelectContent className="bg-gray-900 text-white border-gray-700">
+                  {CATEGORIES.map((c, i) => (
+                    <SelectItem key={i} value={c.category}>
+                      {c.category}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
-            {/* Thumbnail */}
+            {/* SUBCATEGORY */}
+            {form.category && (
+              <div>
+                <Label>Subcategory</Label>
+                <Select
+                  onValueChange={(value) =>
+                    setForm((prev) => ({
+                      ...prev,
+                      subcategory: value,
+                    }))
+                  }
+                >
+                  <SelectTrigger className="bg-gray-900 border-gray-700 text-white">
+                    <SelectValue placeholder="Select Subcategory" />
+                  </SelectTrigger>
+
+                  <SelectContent className="bg-gray-900 text-white border-gray-700">
+                    {CATEGORIES.find(
+                      (c) => c.category === form.category
+                    )?.subcategories.map((s, i) => (
+                      <SelectItem key={i} value={s}>
+                        {s}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            {/* THUMBNAIL */}
             <div>
               <Label>Thumbnail Image</Label>
               <Input
@@ -158,9 +338,14 @@ export default function UploadProject() {
                 onChange={handleThumbnailUpload}
                 className="bg-gray-900 border-gray-700 text-white"
               />
+              {form.thumbnail && (
+                <p className="text-xs text-green-400 mt-1">
+                  Thumbnail uploaded ✔️
+                </p>
+              )}
             </div>
 
-            {/* Images */}
+            {/* ADDITIONAL IMAGES */}
             <div>
               <Label>Additional Images</Label>
               <Input
@@ -168,9 +353,14 @@ export default function UploadProject() {
                 onChange={handleImagesUpload}
                 className="bg-gray-900 border-gray-700 text-white"
               />
+              {!!form.images.length && (
+                <p className="text-xs text-green-400 mt-1">
+                  {form.images.length} image(s) added ✔️
+                </p>
+              )}
             </div>
 
-            {/* File URL */}
+            {/* PROJECT FILE */}
             <div>
               <Label>Project File (ZIP / PDF etc.)</Label>
               <Input
@@ -179,6 +369,11 @@ export default function UploadProject() {
                 required
                 className="bg-gray-900 border-gray-700 text-white"
               />
+              {form.fileUrl && (
+                <p className="text-xs text-green-400 mt-1">
+                  Project file uploaded ✔️
+                </p>
+              )}
             </div>
 
             <Button className="w-full" disabled={isPending}>

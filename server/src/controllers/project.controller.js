@@ -78,6 +78,7 @@ export const uploadProject = async (req, res) => {
     price,
     techStack,
     category,
+    subcategory,
     thumbnail, // Frontend sent this as a URL string
     images,    // Frontend sent this as an array of URL strings
     fileUrl    // Frontend sent this as a URL string
@@ -98,6 +99,7 @@ export const uploadProject = async (req, res) => {
       price,
       techStack,
       category,
+      subcategory,
       thumbnail,
       images,
       fileUrl,

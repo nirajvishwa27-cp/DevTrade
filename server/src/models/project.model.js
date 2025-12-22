@@ -13,14 +13,16 @@ const projectSchema = new mongoose.Schema(
 
     price: { type: Number, required: true },
     techStack: [String], // ["React", "Node", "ML"]
-    category: { type: String }, // "Web", "ML", "Android", etc.
+    category: { type: String, required: true },
+    subcategory: { type: String, required: true },
+    // "Web", "ML", "Android", etc.
 
     thumbnail: { type: String }, // image URL (Supabase)
     images: [String], // additional previews
     fileUrl: { type: String }, // downloadable file after purchase
-  
+
     rating: { type: Number, default: 0 },
-    status: { type: String, enum: ["active", "not_active"], default: "active"},
+    status: { type: String, enum: ["active", "not_active"], default: "active" },
     salesCount: { type: Number, default: 0 },
   },
   {
