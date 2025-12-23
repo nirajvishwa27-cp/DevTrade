@@ -1,4 +1,4 @@
-import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
@@ -6,92 +6,78 @@ import { Heart, BadgeCheck } from "lucide-react";
 
 export default function ProjectCard({ project }) {
   return (
-    <Card
-      className="
-        max-w-sm w-full overflow-hidden rounded-2xl 
-        bg-gray-900 border border-gray-800 shadow-lg
-        transition-all duration-300 hover:shadow-xl hover:border-gray-700
-      "
-    >
-      {/* ---------- TOP: FULL IMAGE BANNER ---------- */}
-      <div className="relative w-full h-44 rounded-t-2xl overflow-hidden">
-        {/* Soft Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-800/40 to-purple-700/20 z-10" />
+    <div className="group relative">
 
-        {/* Main Image */}
-        <img
-          src={project.thumbnail || "/placeholder.png"}
-          alt={project.title}
-          className="
-            w-full h-full object-cover 
-            transition duration-500 
-            group-hover:scale-105
-          "
-        />
+      {/* subtle hover glow (ONE COLOR ONLY) */}
+      <div className="absolute inset-0 rounded-xl bg-blue-500/10 opacity-0 group-hover:opacity-100 blur-lg transition" />
 
-        {/* Heart button (like) */}
-        <button
-          className="
-            absolute top-3 right-3 z-20 
-            bg-white/20 backdrop-blur-md p-2 rounded-full 
-            hover:bg-white/30 transition
-          "
-        >
-          <Heart className="w-4 h-4 text-white" />
-        </button>
-      </div>
+      <Card
+        className="
+          relative flex gap-4 p-3 rounded-xl
+          bg-[#0F1629]
+          border border-white/5
+          transition
+          hover:border-white/10
+        "
+      >
 
-      {/* ---------- CONTENT ---------- */}
-      <CardContent className="p-5 pb-3">
-        {/* Title */}
-        <h2 className="text-lg font-semibold text-white flex items-center gap-1">
-          {project.title}
-          <BadgeCheck className="w-4 h-4 text-blue-400" />
-        </h2>
+        {/* IMAGE */}
+        <div className="relative w-40 h-24 flex-shrink-0 rounded-lg overflow-hidden bg-black">
+          <img
+            src={project.thumbnail || '/placeholder.png'}
+            alt={project.title}
+            className="w-full h-full object-cover"
+          />
 
-        {/* Tech Tags */}
-        <div className="flex gap-2 mt-2">
-          {project.techStack?.slice(0, 3).map((tech) => (
-            <Badge
-              key={tech}
-              className="
-                bg-gray-800 text-gray-300 
-                px-2 py-0.5 text-xs rounded-md
-              "
-            >
-              {tech}
-            </Badge>
-          ))}
+          <button className="absolute top-2 right-2 bg-black/50 p-1.5 rounded-full">
+            <Heart className="w-3.5 h-3.5 text-white" />
+          </button>
         </div>
 
-        {/* Description */}
-        <p className="text-gray-400 text-sm mt-3 line-clamp-2">
-          {project.description}
-        </p>
+        {/* CONTENT */}
+        <div className="flex flex-col justify-between flex-1 min-w-0">
 
-        {/* Price */}
-        <div className="mt-4">
-          <p className="text-xs text-gray-400">PRICE</p>
-          <p className="text-xl font-bold text-green-400">
-            ₹{project.price}
-          </p>
+          {/* TOP */}
+          <div>
+            <h3 className="text-sm font-semibold text-gray-200 flex items-center gap-1 truncate">
+              {project.title}
+              <BadgeCheck className="w-3.5 h-3.5 text-blue-500" />
+            </h3>
+
+            <div className="flex gap-1.5 mt-1 flex-wrap">
+              {project.techStack?.slice(0, 2).map((tech) => (
+                <Badge
+                  key={tech}
+                  className="bg-white/5 text-[10px] text-gray-300"
+                >
+                  {tech}
+                </Badge>
+              ))}
+            </div>
+
+            <p className="text-xs text-gray-400 mt-1 line-clamp-1">
+              {project.description}
+            </p>
+          </div>
+
+          {/* BOTTOM */}
+          <div className="flex items-center justify-between mt-2">
+            <span className="text-green-500 font-semibold text-sm">
+              ₹{project.price}
+            </span>
+
+            <Link to={`/project/${project._id}`}>
+              <Button
+                size="sm"
+                className="h-7 px-3 text-xs bg-white text-black hover:bg-gray-200"
+              >
+                View
+              </Button>
+            </Link>
+          </div>
+
         </div>
-      </CardContent>
-
-      {/* ---------- FOOTER ---------- */}
-      <CardFooter className="p-5 pt-0 flex justify-end">
-        <Link to={`/project/${project._id}`} className="w-full">
-          <Button
-            className="
-              w-full bg-white text-black 
-              hover:bg-gray-200 rounded-lg 
-              font-medium
-            "
-          >
-            View Project
-          </Button>
-        </Link>
-      </CardFooter>
-    </Card>
+      </Card>
+    </div>
   );
 }

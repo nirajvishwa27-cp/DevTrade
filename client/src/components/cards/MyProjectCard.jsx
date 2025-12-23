@@ -21,16 +21,23 @@ export default function MyProjectCard({ project, refetch }) {
   });
 
   return (
-    <div className="bg-[#0d121a] border border-gray-800 rounded-xl shadow-lg p-4 space-y-4">
+    <div className="group relative rounded-xl bg-[#0F1629] border border-white/5">
+
       {/* Project Preview */}
       <ProjectCard project={project} />
 
-      {/* ACTION BUTTONS */}
-      <div className="grid grid-cols-2 gap-3 pt-2">
-        <Link to={`/update/${project._id}`}>
+      {/* ===== OWNER ACTION BAR ===== */}
+      <div className="flex gap-3 p-3 border-t border-white/5 bg-black/20">
+
+        <Link to={`/update/${project._id}`} className="flex-1">
           <Button
             size="sm"
-            className="w-full bg-blue-600/90 hover:bg-blue-600 transition"
+            className="
+              w-full h-9
+              bg-white/10 text-white
+              hover:bg-white/20
+              transition
+            "
           >
             Edit
           </Button>
@@ -40,46 +47,54 @@ export default function MyProjectCard({ project, refetch }) {
           size="sm"
           onClick={() => setConfirmOpen(true)}
           disabled={isPending}
-          className="w-full bg-red-600/90 hover:bg-red-600 transition"
+          className="
+            w-full h-9 flex-1
+            bg-red-500/15 text-red-400
+            hover:bg-red-500/25 hover:text-red-300
+            transition
+          "
         >
           Delete
         </Button>
       </div>
 
-      {/* CONFIRM MODAL */}
+      {/* ===== CONFIRM MODAL ===== */}
       {confirmOpen &&
         createPortal(
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 px-4">
-  <div className="bg-gray-900 border border-gray-700 rounded-xl p-6 w-full max-w-sm md:max-w-md shadow-2xl">
-    
-    <h2 className="text-xl font-semibold text-white mb-2">Delete Project?</h2>
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4">
+            <div className="w-full max-w-sm rounded-xl bg-[#0F1629] border border-white/10 p-6">
 
-    <p className="text-gray-400 mb-6 text-sm leading-relaxed">
-      Are you sure you want to delete{" "}
-      <span className="text-white font-medium">{project.title}</span>?
-      This action cannot be undone.
-    </p>
+              <h2 className="text-lg font-semibold text-white mb-2">
+                Delete Project?
+              </h2>
 
-    <div className="flex gap-3 flex-wrap justify-end">
-      <Button
-        variant="secondary"
-        className="px-4 py-2 text-sm"
-        onClick={() => setConfirmOpen(false)}
-      >
-        Cancel
-      </Button>
+              <p className="text-sm text-gray-400 mb-6">
+                Are you sure you want to delete{" "}
+                <span className="text-white font-medium">
+                  {project.title}
+                </span>
+                ? This action cannot be undone.
+              </p>
 
-      <Button
-        className="px-4 py-2 text-sm bg-red-600 hover:bg-red-700"
-        disabled={isPending}
-        onClick={() => mutate()}
-      >
-        {isPending ? "Deleting..." : "Confirm"}
-      </Button>
-    </div>
-  </div>
-</div>
-,
+              <div className="flex justify-end gap-3">
+                <Button
+                  variant="secondary"
+                  className="h-8 px-4 text-sm"
+                  onClick={() => setConfirmOpen(false)}
+                >
+                  Cancel
+                </Button>
+
+                <Button
+                  className="h-8 px-4 text-sm bg-red-600 hover:bg-red-700"
+                  disabled={isPending}
+                  onClick={() => mutate()}
+                >
+                  {isPending ? "Deleting…" : "Confirm"}
+                </Button>
+              </div>
+            </div>
+          </div>,
           document.body
         )}
     </div>

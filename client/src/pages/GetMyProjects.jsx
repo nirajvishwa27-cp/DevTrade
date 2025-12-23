@@ -15,25 +15,24 @@ export default function MyProjects() {
     enabled: !!user?._id,
   });
 
-  // 🔥 FIX: correct API structure
   const projects = data?.data?.projects || [];
 
-  // ------------------ LOADING UI ------------------
+  /* ================= LOADING ================= */
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-black text-white p-6">
+      <div className="min-h-screen bg-[#0B0F1A] text-white px-4 sm:px-6 py-8">
         <h1 className="text-3xl font-bold mb-6">My Projects</h1>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[...Array(6)].map((_, i) => (
             <div
               key={i}
-              className="bg-gray-900 border border-gray-800 rounded-xl p-4 animate-pulse"
+              className="bg-white/5 border border-white/10 rounded-xl p-4 animate-pulse"
             >
-              <div className="h-40 bg-gray-800 rounded mb-4" />
-              <div className="h-4 bg-gray-800 rounded w-3/4 mb-2" />
-              <div className="h-4 bg-gray-800 rounded w-1/2 mb-4" />
-              <div className="h-8 bg-gray-800 rounded" />
+              <div className="h-32 bg-white/10 rounded-lg mb-3" />
+              <div className="h-3 bg-white/10 rounded w-3/4 mb-2" />
+              <div className="h-3 bg-white/10 rounded w-1/2 mb-3" />
+              <div className="h-8 bg-white/10 rounded-lg" />
             </div>
           ))}
         </div>
@@ -41,34 +40,25 @@ export default function MyProjects() {
     );
   }
 
-  // ------------------ API ERROR UI ------------------
-  // if (isError) {
-  //   return (
-  //     <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-6">
-  //       <div className="bg-gray-900 border border-gray-800 p-10 rounded-xl text-center shadow-xl">
-  //         <h2 className="text-2xl font-semibold mb-3">Error Loading Projects</h2>
-  //         <p className="text-gray-400 mb-6">
-  //           Something went wrong. Try again later.
-  //         </p>
-
-  //         <Button onClick={refetch} className="bg-blue-600 hover:bg-blue-700">
-  //           Retry
-  //         </Button>
-  //       </div>
-  //     </div>
-  //   );
-  // }
-
-  // ------------------ NO PROJECTS UI ------------------
+  /* ================= EMPTY / ERROR ================= */
   if (projects.length === 0 || isError) {
     return (
-      <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-6">
-        <div className="bg-gray-900 border border-gray-800 p-10 rounded-xl text-center shadow-xl">
-          <h2 className="text-3xl font-semibold mb-3">No Projects Yet</h2>
-          <p className="text-gray-400 mb-6">Upload your first project and start selling!</p>
+      <div className="min-h-screen bg-[#0B0F1A] text-white flex items-center justify-center px-4">
+        <div className="relative max-w-md w-full bg-[#0F1629] border border-white/10 rounded-2xl p-10 text-center">
+
+          {/* subtle pattern */}
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(45,212,191,0.08),transparent_60%)] rounded-2xl pointer-events-none" />
+
+          <h2 className="text-3xl font-semibold mb-3">
+            No Projects Yet
+          </h2>
+
+          <p className="text-gray-400 mb-6">
+            Upload your first project and start selling today.
+          </p>
 
           <Link to="/upload">
-            <Button className="bg-blue-600 hover:bg-blue-700 px-6 py-3 text-lg">
+            <Button className="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-xl text-lg">
               Upload Project
             </Button>
           </Link>
@@ -77,15 +67,33 @@ export default function MyProjects() {
     );
   }
 
-  // ------------------ SUCCESS UI ------------------
+  /* ================= SUCCESS ================= */
   return (
-    <div className="min-h-screen bg-black text-white p-6">
-      <h1 className="text-3xl font-bold mb-6">My Projects</h1>
+    <div className="min-h-screen bg-[#0B0F1A] text-white relative overflow-hidden">
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {projects.map((p) => (
-          <MyProjectCard key={p._id} project={p} refetch={refetch} />
-        ))}
+      {/* light gradient pattern (safe) */}
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-900/10 via-transparent to-teal-900/10 pointer-events-none" />
+
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-8">
+
+        {/* Header */}
+        <div className="mb-6">
+          <h1 className="text-4xl font-bold mb-1">My Projects</h1>
+          <p className="text-gray-400">
+            Manage, edit and track your uploaded projects.
+          </p>
+        </div>
+
+        {/* Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {projects.map((project) => (
+            <MyProjectCard
+              key={project._id}
+              project={project}
+              refetch={refetch}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );
